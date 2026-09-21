@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Embedded Panel",
+  "version": "1.0.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqlzx2HUyql+3xb+A3pqBNUvEjaipJRPA8xAwYhW7lscLc2ic8yr4GRnua4F1YRpkNaHfTN19IaHObVl45mQ9vBEcXYHRee1KflSNJUmcq3g5+6Q+88ibbVu/hFuo1XuQq/ATA+96NjK+gsRchwfe2iTvulVx/eRoA9Pg5S1BNdQWgiWh5BlAtrAii8ZOpe7J8/NXV+wHjyDJRB6SPdJzrdY3OdUjE45qwQvcFysseh36YyXzeSIjlySfxqYhwBIiD25CV5lBT2KRw0yCEDGuL8adE0d2kTI96KfAkAkKFOi0srysFGwtV1xX/HJrxcZQ2BG+EfITiO4z1JxQJBqOUQIDAQAB",
+  "description": "Runs the signed-in ChatGPT Web UI in a Chrome Side Panel and lets the current ordinary webpage become a task's locked Browser WebMCP target.",
+  "permissions": [
+    "scripting",
+    "nativeMessaging",
+    "sidePanel",
+    "storage",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Open ChatGPT Panel"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "embedded-chatgpt.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "model-probe.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://chatgpt.com;"
+  }
+}

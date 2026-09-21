@@ -1,0 +1,18 @@
+{
+  "name": "chatgpt-embedded-panel",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check embedded-chatgpt.js && node --check model-probe.js && node --check model-status.js && node --check service-worker.js && node --check sidepanel.js && node --check scripts/activate-browser-tunnel.mjs && node --check scripts/install-browser-tunnel-launchd.mjs && node --check scripts/local-setup.mjs && node --check scripts/local-doctor.mjs && node --check scripts/local-uninstall.mjs && node --test tests/*.test.js",
+    "browser:mcp": "node browser-mcp/stdio-server.js",
+    "browser:native:install": "node scripts/native-host-installer.mjs",
+    "browser:tunnel:activate": "node scripts/activate-browser-tunnel.mjs",
+    "browser:tunnel:install": "node scripts/install-browser-tunnel-launchd.mjs",
+    "local:setup": "node scripts/local-setup.mjs",
+    "local:doctor": "node scripts/local-doctor.mjs",
+    "local:uninstall": "node scripts/local-uninstall.mjs"
+  }
+}
