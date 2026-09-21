@@ -6,26 +6,31 @@ Current focus: reproduce the working system on another Mac through the recipient
 
 ```mermaid
 flowchart TD
-    B["Browser execution + webpage read/write: working baseline"]
-    L["Local file/shell execution: working baseline, separately installed"]
-    B --> C["ChatGPT Side Panel: implemented and used locally"]
-    B --> D["DeepSeek Side Panel: closeout completed"]
-    C --> I["S1: delivery inventory recorded; release versions still to lock"]
+    B["✓ 底层执行能力已完成<br/>Browser 执行 · 网页读写 · 本地文件读写与命令"]:::done
+    B --> C["✓ ChatGPT Side Panel 已完成"]:::done
+    B --> D["✓ DeepSeek Side Panel 已完成"]:::done
+    C --> I["✓ 交付清单与组件边界已记录"]:::done
     D --> I
-    L --> I
-    I --> U["S2: unified helper + AI runbook implemented; seven review fixes passed"]
-    U --> M["S3: next — another Mac + helper AI acceptance"]
-    M --> E["S4: future — local/company models and company web-AI adapters"]
-    U --> H["ChatGPT non-technical Hosted path: feasibility gates still open"]
-    H --> P["Future — Hosted implementation and separate acceptance"]
+    I --> U["✓ 统一入口已实现并通过安装专项复审<br/>检查／诊断／下载工具 ＋ AI 安装手册"]:::done
+    U --> W["进行中：第一版交付基线收尾<br/>滚动与视野读取已实现；2 项引用问题待修"]:::active
+    W --> V["待做：锁定发行版本<br/>含 DeepSeek 安装器版本锁定"]
+    V --> M["待做：另一台 Mac 的 AI 辅助安装验收<br/>面板、连接、真实网页工具调用"]
+    M --> E["后续：扩展 Browser MCP 模型接入<br/>本地模型／公司模型／公司网页 AI"]
+    U -.-> H["独立待办：非技术用户的 ChatGPT Hosted 路径<br/>可行性验证 → 实现 → 验收"]
+    classDef done fill:#dcfce7,stroke:#15803d,color:#14532d,stroke-width:2px;
+    classDef active fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px;
 ```
 
+**图例：绿色 + ✓ = 已完成；黄色 = 正在做；默认框 = 尚未完成。** “已完成”指已有本机基线或所注明的专项检查，不代表所有网站、另一台 Mac 或 Hosted 路径均已验收。本地执行仍是独立安装的组件；图中的底层汇总不改变其边界。两套 Side Panel 是并列能力。
+
+- **Current review (`ce98033`):** A4 adds the sixth tool, `scroll`, viewport-first controls/text and element-identity checks; the update runbook now includes the Browser service, extension and ChatGPT app refresh sequence. Panel `npm run check` passed **140/140** this round. The two shared execution files match the DeepSeek copies byte-for-byte. Review findings and additional acceptance must be closed before treating the new enhancement as complete.
+- **Open review findings (reproduced against the real executor in the isolated DOM fixture):** (1) a recycled node inspected as A, then B, then changed back to A accepts its original ref again; (2) a recycled checkbox whose associated label changes from A to B retains the original ref and accepts a click. Retire superseded refs permanently and distinguish text-editable inputs from checkbox/radio/button controls when recording identity. Both shared copies need the same bounded fix and regression coverage. No production fix was made during this review.
 - **Completed locally:** browser and local execution foundations, parallel ChatGPT/DeepSeek Side Panels, fixed extension IDs, delivery inventory, and the unified helper/runbook. DeepSeek closeout does not imply every real-site scenario has passed; see the [inventory's known limits](docs/release-inventory-v1.md).
 - **Review passed:** installer-entry fixes at `1fc5c13`; Panel `npm run check` **125/125** in this review. The superseded Family Installer prototype was retired at `192374a`.
 - **Next delivery gate:** an AI helper follows the runbook on another Mac. Record panel usability, connector health, model connection, and a real tool call separately; local tests are not evidence of this acceptance. Pin the released component versions, including the deferred DeepSeek installer version option.
 - **Distribution follows A2:** DeepSeek first for non-technical users; ChatGPT Tunnel for technical users. ChatGPT via Hosted Relay is a separate unfinished path, including target-plan capability and local-coding design gates. Existing Browser MCP already works; S4 extends model compatibility rather than starting Browser execution from scratch.
 
-The detailed implementation milestones below retain their own acceptance status. Governing decisions: [A1–A3](docs/architecture-decision-v1.md#9-amendments).
+The detailed implementation milestones below retain their own acceptance status. Governing decisions: [A1–A4](docs/architecture-decision-v1.md#9-amendments).
 
 ## Current — causal page handoff
 
