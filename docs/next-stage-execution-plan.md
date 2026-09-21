@@ -20,7 +20,7 @@ Stable Browser Execution Plane:
       -> runBrowserTool()
       -> browser-client.js
       -> target-executor.js
-      -> inspect_page / inspect_form / fill / select / click
+      -> inspect_page / inspect_form / fill / select / click / scroll
 
 Changing deployment or model provider must not rewrite this layer without a demonstrated correctness blocker.
 

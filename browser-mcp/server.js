@@ -19,7 +19,7 @@ export const BROWSER_MCP_TOOLS = Object.freeze([
 export const FULL_BROWSER_MCP_TOOLS = Object.freeze([
   Object.freeze({
     name: 'inspect_page',
-    description: 'Inspect the current locked webpage and return visible text plus actionable element refs.',
+    description: 'Inspect the current locked webpage and return visible text plus actionable element refs. Controls currently in the viewport are returned first (at most 80); the viewport field gives the scroll position and page size. If truncated is true, use scroll and inspect again.',
     inputSchema: Object.freeze({
       type: 'object',
       additionalProperties: false,
@@ -69,6 +69,20 @@ export const FULL_BROWSER_MCP_TOOLS = Object.freeze([
       additionalProperties: false,
       required: Object.freeze(['ref']),
       properties: Object.freeze({
+        ref: Object.freeze({ type: 'string', minLength: 1, maxLength: 64 }),
+      }),
+    }),
+  }),
+  Object.freeze({
+    name: 'scroll',
+    description: 'Scroll the current locked webpage, or the scrollable area around a previously returned element ref. Positive deltaY scrolls down, negative up; positive deltaX scrolls right, negative left; each is at most 3000 pixels per call. This is reversible viewport navigation; it does not click, submit or navigate, but scrolling may trigger lazy loading or infinite-scroll content. Call inspect_page afterwards: the controls now on screen are returned first. The result reports the scroll position, its maximum, and atStart/atEnd for the main axis.',
+    inputSchema: Object.freeze({
+      type: 'object',
+      additionalProperties: false,
+      required: Object.freeze(['deltaY']),
+      properties: Object.freeze({
+        deltaY: Object.freeze({ type: 'number', minimum: -3000, maximum: 3000 }),
+        deltaX: Object.freeze({ type: 'number', minimum: -3000, maximum: 3000 }),
         ref: Object.freeze({ type: 'string', minLength: 1, maxLength: 64 }),
       }),
     }),

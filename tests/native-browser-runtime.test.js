@@ -130,10 +130,10 @@ test('extension native bridge rejects invalid browser tool arguments before disp
   assert.equal(fake.posted[0].error.code, 'INVALID_ARGUMENTS');
 });
 
-test('production Browser MCP exposes exactly the five existing Browser WebMCP tools and forwards calls', async () => {
+test('production Browser MCP exposes exactly the six Browser WebMCP tools and forwards calls', async () => {
   assert.deepEqual(
     FULL_BROWSER_MCP_TOOLS.map(({ name }) => name),
-    ['inspect_page', 'inspect_form', 'fill', 'select', 'click'],
+    ['inspect_page', 'inspect_form', 'fill', 'select', 'click', 'scroll'],
   );
 
   const seen = [];
@@ -148,7 +148,7 @@ test('production Browser MCP exposes exactly the five existing Browser WebMCP to
   const listed = await server.handle({ jsonrpc: '2.0', id: 1, method: 'tools/list' });
   assert.deepEqual(
     listed.result.tools.map(({ name }) => name),
-    ['inspect_page', 'inspect_form', 'fill', 'select', 'click'],
+    ['inspect_page', 'inspect_form', 'fill', 'select', 'click', 'scroll'],
   );
 
   const called = await server.handle({
@@ -161,6 +161,15 @@ test('production Browser MCP exposes exactly the five existing Browser WebMCP to
   assert.deepEqual(seen, [{ name: 'fill', args: { ref: 'e1', value: 'hello' } }]);
   assert.equal(called.result.isError, undefined);
   assert.equal(called.result.structuredContent.ok, true);
+
+  const scrollTool = listed.result.tools.find(({ name }) => name === 'scroll');
+  assert.deepEqual(scrollTool.inputSchema.required, ['deltaY']);
+  assert.equal(scrollTool.inputSchema.additionalProperties, false);
+  assert.deepEqual(Object.keys(scrollTool.inputSchema.properties).sort(), ['deltaX', 'deltaY', 'ref']);
+  assert.equal(scrollTool.inputSchema.properties.deltaY.maximum, 3000);
+  assert.equal(scrollTool.inputSchema.properties.deltaY.minimum, -3000);
+  assert.match(scrollTool.description, /lazy loading/);
+  assert.doesNotMatch(scrollTool.description, /does not modify page content/);
 });
 
 test('production Browser MCP hides local transport details when the Chrome bridge is unavailable', async () => {

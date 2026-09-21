@@ -136,3 +136,17 @@ Decisions (owner, 2026-09-21):
 - `fill` worked: after the owner pressed Submit, httpbin echoed `custname: "Bo"` and `custtel: "12345678"` with the other fields empty. The assistant refused to press Submit itself; that refusal is the product's own owner rule (`CONFIRMATION_REQUIRED` from the page executor), not a ChatGPT policy.
 - So write tools work from a **Plus** account over the **Tunnel** path. Not established: whether a Plus account can write through a **public-URL connector** (the Hosted path). The Help Center says full MCP writes are Business/Enterprise/Edu only and Pro read-only for MCP connectors, yet the Tunnel path wrote on Plus; the likely reading is that the statement does not cover the private Tunnel path, but this is an inference. The Hosted path still needs its own one-tool test before any relay code (see `hosted-relay-go-no-go.md` C1).
 
+### A4 — 2026-09-21, Browser tool contract: five tools become six (`scroll`)
+
+Evidence: on a real page (a social-media profile) `inspect_page` returned `truncated: true` because it takes the first 80 visible controls in document order, so a link that was visible in the text had no ref, and nothing let the model move the page.
+
+Decision (minimal, no new permission):
+- **`scroll({ deltaY, deltaX?, ref? })`.** Deltas are clamped to +/-3000 per call. Without `ref`: the document's scrolling element first; if it cannot move in that direction, the largest scrollable container under the viewport that can. With `ref`: the referenced element's nearest scrollable ancestor, then the page; otherwise an explicit `SCROLL_TARGET_NOT_FOUND`, never another area. Implemented with DOM `scrollBy()` (no synthetic wheel events, no `chrome.debugger`). The result reports `moved`, `target`, `axis`, `x`, `y`, `maxX`, `maxY`, `atStart`, `atEnd` (for the dominant axis); the position change is the authority for `moved`. No confirmation is needed: it is reversible viewport navigation, but it may trigger lazy loading or infinite scroll.
+- **`inspect_page` is viewport-first.** `MAX_ELEMENTS` stays 80; controls intersecting the viewport come first (document order), the rest fill remaining slots; at most 1500 candidates are examined. The result gains `viewport` (top-level scroll position and page size). No cursor pagination.
+- **A ref now stands for an element and what it was when inspected** (role, name, link target; editable controls without their live text). A reused DOM node that shows something else gets a new ref and the old ref keeps failing with `STALE_REF`, so windowed lists cannot redirect an old ref to a new row.
+- **Not added:** generic keyboard, generic mouse, raw JavaScript, `chrome.debugger`, a shared executor package (the two `target-executor.js` copies stay in step by hand), or a higher `MAX_ELEMENTS`.
+- Limit: pages that scroll only through wheel event handlers do not respond to `scrollBy()`.
+- Operations: after the Browser MCP is updated, refresh the app in ChatGPT (Plugins) and start a new conversation, or the sixth tool is not listed.
+
+Sequence: Panel first (this record), then the DeepSeek copy (executor, tool registry, E2E fixtures). Panel verification: unit tests (fake geometry) and a run of the real executor in Chromium against a long page, an inner scroll container, and windowed lists that remount or recycle nodes.
+

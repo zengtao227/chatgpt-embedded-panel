@@ -17,7 +17,7 @@ Do not redesign this layer merely because the model provider or transport change
       -> runBrowserTool()
       -> browser-client.js
       -> target-executor.js
-      -> inspect_page / inspect_form / fill / select / click
+      -> inspect_page / inspect_form / fill / select / click / scroll
 
 This is the reusable Browser Execution Plane. The intelligence/host and the transport around it are replaceable.
 
@@ -187,7 +187,7 @@ Acceptance: a real ChatGPT call reaches the browser and returns the target resul
 
 ### H2 — actual target-plan action capability
 
-After inspect_page passes, test one reversible action on the actual ChatGPT plan/workspace intended for the product and confirm whether the full five-tool surface is supported.
+After inspect_page passes, test one reversible action on the actual ChatGPT plan/workspace intended for the product and confirm whether the full six-tool surface is supported.
 
 ### H3/H4 — authentication and multi-user isolation
 
