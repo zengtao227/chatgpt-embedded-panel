@@ -19,7 +19,7 @@ export const BROWSER_MCP_TOOLS = Object.freeze([
 export const FULL_BROWSER_MCP_TOOLS = Object.freeze([
   Object.freeze({
     name: 'inspect_page',
-    description: 'Inspect the current locked webpage and return visible text plus actionable element refs. Controls currently in the viewport are returned first (at most 80); the viewport field gives the scroll position and page size. If truncated is true, use scroll and inspect again.',
+    description: 'Inspect the current locked webpage and return visible text plus actionable element refs. Controls currently in the viewport are returned first (at most 80), and text is taken from around the viewport (textScope tells which); the viewport field gives the scroll position and page size. If truncated is true or you need other parts of the page, use scroll and inspect again.',
     inputSchema: Object.freeze({
       type: 'object',
       additionalProperties: false,
