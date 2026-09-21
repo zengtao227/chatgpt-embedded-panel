@@ -20,6 +20,10 @@ This repository is the source of truth. Read these first:
 - Submit, send, pay and delete clicks stay with the person; the assistant must never press them.
 - Local file and command execution belongs to the separate Native component, not to this extension.
 
+## Changing a tool's name, arguments or description
+
+The DeepSeek panel sends the tool contract in its prompt, so reloading the extension is enough there. The ChatGPT path is different and needs, in this order: restart the Browser service (`launchctl kickstart -k gui/$(id -u)/com.webmcp.browser-tunnel`), reload the extension, press **Refresh** on the app (ChatGPT, Plugins, Personal, Browser MCP, Manage), and test in a **new** conversation; ChatGPT keeps a frozen copy of the tool list until Refresh. Keep `target-executor.js` and `browser-client.js` byte-identical with the `deepseek-webmcp` copies and update the pins in its `tests/shared-core.test.js` together. Update the governing record for any change to the set of tools.
+
 ## Commits
 
 Use `type: short description` (`fix:`, `feat:`, `docs:`, `test:`, `chore:`) and explain the reason in the body. Prefer a branch and a pull request for anything larger than a small fix.

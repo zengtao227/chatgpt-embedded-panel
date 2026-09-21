@@ -67,6 +67,13 @@ The work folder is the narrowest folder the person is happy for ChatGPT to chang
 
 ## Component `panel` (ChatGPT side panel)
 
+The ChatGPT path has three places that keep old state, unlike the DeepSeek panel (whose tools are sent in each conversation's prompt): the Browser MCP service, the Native Messaging host (bound to one extension id) and ChatGPT's own frozen copy of the app's tool list. After **any** update of this repository, do all of these, in this order:
+
+1. `cd ~/WebMCP/chatgpt-embedded-panel && git pull --ff-only`, then `npm run local:setup -- --tunnel-id <browser tunnel id> --runtime-key-file ~/.webmcp-runtime-key --tunnel-client "<path>"` (safe to repeat; it rewrites the host's allowed extension id and runs the doctor).
+2. Restart only the Browser service so it serves the new code: `launchctl kickstart -k gui/$(id -u)/com.webmcp.browser-tunnel`, then `npm run local:doctor` must say READY.
+3. On `chrome://extensions`, reload the extension.
+4. In ChatGPT: Plugins, Personal, **Browser MCP**, the ⋯ menu, **Manage**, then **Refresh** in the Information section. Check that the Actions list shows the current tools (`inspect_page`, `inspect_form`, `fill`, `select`, `click`, `scroll`). A conversation that was open before does not pick this up: start a new one.
+
 ```bash
 cd ~/WebMCP/chatgpt-embedded-panel
 npm run local:setup -- --tunnel-id <browser tunnel id> --runtime-key-file ~/.webmcp-runtime-key --tunnel-client "<path from CHECK tunnel-client>"
@@ -91,6 +98,8 @@ Development installs follow branch heads: `main` for each component and for Deep
 
 | Symptom | Action |
 |---|---|
+| ChatGPT lists fewer tools than the repository has (for example no `scroll`) | ChatGPT keeps a frozen copy of the app's tool list. Restart the Browser service and press **Refresh** in the app's Manage page (steps in the `panel` section), then start a new conversation. Reloading the page or the extension does not update it |
+| ChatGPT says `BROWSER_BRIDGE_UNAVAILABLE`, or Chrome logs "Access to the specified native messaging host is forbidden" | The extension's id is not the one the Native Messaging host allows. The id must be `podhehbmgkecchcfmffhfjaakedjgcbe`; if it is, re-run `npm run local:setup -- --tunnel-id <browser tunnel id>` (it rewrites the host's allowed id), then reload the extension |
 | DeepSeek panel says the provider did not become ready | Press **Restore** in the panel |
 | DeepSeek panel says its window is hidden | Move windows so a strip of the DeepSeek window stays visible, then press **Restore**. A fully covered window cannot render answers |
 | `docker-running` FAIL | `open -a Docker`, wait until it says running, re-run check |
