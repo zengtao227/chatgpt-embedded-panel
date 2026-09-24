@@ -64,7 +64,7 @@ The old hidden conversation-text protocol and DOM repair layer are removed from 
 
 `ChatGPT Web -> Secure MCP Tunnel -> thin Browser MCP server -> owner-only Unix socket -> Chrome Native Messaging -> service worker -> browser-client.js -> target-executor.js`.
 
-The Browser MCP server exposes exactly six bounded page tools: `inspect_page`, `inspect_form`, `fill`, `select`, `click` and `scroll` (`scroll` added by amendment A4 in `docs/architecture-decision-v1.md`). The separate `webmcp-bridge` Base remains unchanged and continues to own local filesystem/bash access.
+The Browser MCP server exposes exactly seven bounded page tools: `inspect_page`, `inspect_form`, `fill`, `select`, `click`, `scroll` and `keyboard` (`scroll` added by A4 and element-scoped `keyboard` by A5 in `docs/architecture-decision-v1.md`). The separate `webmcp-bridge` Base remains unchanged and continues to own local filesystem/bash access.
 
 The embedded ChatGPT content script is now non-invasive: it only verifies the extension iframe, persists safe ChatGPT routes, and provides the Side Panel ready/ping handshake. It does not mutate conversation DOM, inject a browser-tool prompt harness, create continuation messages, hide Called tool rows, or collapse turns. ChatGPT Web owns Thinking/tool/final-answer presentation.
 

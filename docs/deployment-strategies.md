@@ -12,7 +12,7 @@ Chrome Extension
   -> target locking / causal handoff
   -> browser-client.js
   -> target-executor.js
-  -> inspect_page / inspect_form / fill / select / click / scroll
+  -> inspect_page / inspect_form / fill / select / click / scroll / keyboard
 ```
 
 Do not redesign that layer merely to change deployment.

@@ -21,13 +21,13 @@ ChatGPT native MCP
   -> Chrome Extension
   -> browser-client.js
   -> target-executor.js
-  -> inspect_page / inspect_form / fill / select / click / scroll
+  -> inspect_page / inspect_form / fill / select / click / scroll / keyboard
 ```
 
 Current code boundaries:
 
 - `browser-client.js`
-  - validates exactly six Browser tools;
+  - validates exactly seven Browser tools;
   - sends bounded tool calls to the locked webpage executor.
 - `target-executor.js`
   - performs webpage inspection and bounded interactions.

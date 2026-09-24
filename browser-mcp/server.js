@@ -87,6 +87,52 @@ export const FULL_BROWSER_MCP_TOOLS = Object.freeze([
       }),
     }),
   }),
+  Object.freeze({
+    name: 'keyboard',
+    description: 'Send bounded editing keyboard actions to a previously inspected editable control. Use text actions for typing and key actions for caret movement, selection and deletion. Enter/Tab and unsupported shortcuts fail closed so keyboard cannot bypass commit-like click controls.',
+    inputSchema: Object.freeze({
+      type: 'object',
+      additionalProperties: false,
+      required: Object.freeze(['ref', 'actions']),
+      properties: Object.freeze({
+        ref: Object.freeze({ type: 'string', minLength: 1, maxLength: 64 }),
+        actions: Object.freeze({
+          type: 'array',
+          minItems: 1,
+          maxItems: 64,
+          items: Object.freeze({
+            oneOf: Object.freeze([
+              Object.freeze({
+                type: 'object',
+                additionalProperties: false,
+                required: Object.freeze(['type', 'text']),
+                properties: Object.freeze({
+                  type: Object.freeze({ const: 'text' }),
+                  text: Object.freeze({ type: 'string', maxLength: 16384 }),
+                }),
+              }),
+              Object.freeze({
+                type: 'object',
+                additionalProperties: false,
+                required: Object.freeze(['type', 'key']),
+                properties: Object.freeze({
+                  type: Object.freeze({ const: 'key' }),
+                  key: Object.freeze({ type: 'string', minLength: 1, maxLength: 64 }),
+                  modifiers: Object.freeze({
+                    type: 'array',
+                    maxItems: 4,
+                    uniqueItems: true,
+                    items: Object.freeze({ enum: Object.freeze(['Alt', 'Control', 'Meta', 'Shift']) }),
+                  }),
+                  repeat: Object.freeze({ type: 'integer', minimum: 1, maximum: 100 }),
+                }),
+              }),
+            ]),
+          }),
+        }),
+      }),
+    }),
+  }),
 ]);
 
 function jsonRpcResult(id, result) {

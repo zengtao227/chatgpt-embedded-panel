@@ -130,10 +130,10 @@ test('extension native bridge rejects invalid browser tool arguments before disp
   assert.equal(fake.posted[0].error.code, 'INVALID_ARGUMENTS');
 });
 
-test('production Browser MCP exposes exactly the six Browser WebMCP tools and forwards calls', async () => {
+test('production Browser MCP exposes exactly the seven Browser WebMCP tools and forwards calls', async () => {
   assert.deepEqual(
     FULL_BROWSER_MCP_TOOLS.map(({ name }) => name),
-    ['inspect_page', 'inspect_form', 'fill', 'select', 'click', 'scroll'],
+    ['inspect_page', 'inspect_form', 'fill', 'select', 'click', 'scroll', 'keyboard'],
   );
 
   const seen = [];
@@ -148,7 +148,7 @@ test('production Browser MCP exposes exactly the six Browser WebMCP tools and fo
   const listed = await server.handle({ jsonrpc: '2.0', id: 1, method: 'tools/list' });
   assert.deepEqual(
     listed.result.tools.map(({ name }) => name),
-    ['inspect_page', 'inspect_form', 'fill', 'select', 'click', 'scroll'],
+    ['inspect_page', 'inspect_form', 'fill', 'select', 'click', 'scroll', 'keyboard'],
   );
 
   const called = await server.handle({

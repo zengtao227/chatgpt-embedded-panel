@@ -17,7 +17,7 @@ Do not redesign this layer merely because the model provider or transport change
       -> runBrowserTool()
       -> browser-client.js
       -> target-executor.js
-      -> inspect_page / inspect_form / fill / select / click / scroll
+      -> inspect_page / inspect_form / fill / select / click / scroll / keyboard
 
 This is the reusable Browser Execution Plane. The intelligence/host and the transport around it are replaceable.
 
