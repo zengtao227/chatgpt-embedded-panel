@@ -12,9 +12,9 @@ import {
   normalizeTask,
 } from '../target-binding.js';
 
-test('page candidates accept only normal http(s) pages and exclude ChatGPT itself', () => {
+test('page candidates accept any normal http(s) page, including a ChatGPT tab', () => {
   assert.equal(attachablePageUrl('chrome://extensions'), null);
-  assert.equal(attachablePageUrl('https://chatgpt.com/c/abc'), null);
+  assert.equal(attachablePageUrl('https://chatgpt.com/c/abc')?.origin, 'https://chatgpt.com');
   assert.equal(attachablePageUrl('https://example.com/path')?.origin, 'https://example.com');
 });
 

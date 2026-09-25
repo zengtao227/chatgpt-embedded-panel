@@ -5,7 +5,6 @@ export function attachablePageUrl(rawUrl) {
   try {
     const url = new URL(rawUrl);
     if (!['http:', 'https:'].includes(url.protocol)) return null;
-    if (url.origin === 'https://chatgpt.com') return null;
     return url;
   } catch {
     return null;
