@@ -36,8 +36,10 @@ test('manual cross-origin navigation outside a handoff still blocks instead of s
   assert.match(source, /blockedTask\(task\.target, 'ORIGIN_CHANGED'/);
 });
 
-test('handoff uses existing tabs events and does not require webNavigation permission', async () => {
+test('frame-aware Browser WebMCP injects every accessible frame without adding webNavigation permission', async () => {
   const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
+  assert.match(source, /target: \{ tabId, allFrames: true \}/);
+  assert.match(source, /callBrowserTool\(selected\.target\.tabId, call, \{ frameIds \}\)/);
   assert.equal(manifest.permissions.includes('webNavigation'), false);
   assert.equal(manifest.permissions.includes('tabs'), false);
 });

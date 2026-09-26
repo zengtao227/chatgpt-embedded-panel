@@ -21,6 +21,27 @@ Do not redesign this layer merely because the model provider or transport change
 
 This is the reusable Browser Execution Plane. The intelligence/host and the transport around it are replaceable.
 
+### 1.1 Frame-aware embedded pages — correctness fix discovered 2026-09-26
+
+Status: **IMPLEMENTED IN WORKING TREE; automated Browser tests PASS; real Chrome acceptance pending.**
+
+A live Claude Artifact exposed a platform gap: Browser WebMCP could inspect the outer `claude.ai` shell but not the artifact body because the body was rendered in a cross-origin iframe. The old executor was injected only into the tab's top frame (`frameId = 0`) and could only report `CROSS_ORIGIN_IFRAME_UNSUPPORTED` when it saw a child frame.
+
+The generic fix belongs in the shared Browser Execution Plane, not in a Claude-specific adapter:
+
+- inject the existing `target-executor.js` into every accessible frame of the owner-attached tab with `chrome.scripting.executeScript(... allFrames: true)`;
+- each executor reads only its own frame DOM, so the design does not bypass the browser Same-Origin Policy;
+- `inspect_page` and `inspect_form` aggregate the bounded results from accessible frames into one page result;
+- top-frame refs remain `eN`; child-frame refs are namespaced as `f<frameId>:eN` so identical local refs in different frames cannot collide;
+- `click`, `fill`, `select`, `scroll`, and `keyboard` route a namespaced ref back to that exact Chrome frame with `tabs.sendMessage(..., { frameId })`;
+- a missing/navigated child frame fails closed with `FRAME_UNAVAILABLE`; it never falls back to the top frame or another frame;
+- the task lock, origin/handoff state and provider identity remain tab/top-frame concepts. Supporting embedded page frames does **not** let a sub-frame speak for a provider conversation or retarget the task;
+- no `webNavigation`, raw selector, raw JavaScript, or model-supplied standalone frame selector is added. The model can target a child frame only through a ref returned by inspection.
+
+Automated acceptance now covers aggregation, ref collision prevention, child-frame action routing, stale-frame fail-closed behavior, existing keyboard/click safety, and no new browser permission. The shared `browser-client.js` and `target-executor.js` remain byte-identical between ChatGPT Embedded Panel and DeepSeek WebMCP.
+
+Real Chrome gate: open a reproducible cross-origin iframe page (the Claude Artifact is the current sample), verify `inspect_page` returns both outer-shell and embedded-body content, exercise one reversible child-frame action when available, then verify a stale child-frame ref is rejected after the frame navigates/reloads. Until this gate passes, do not describe cross-origin iframe support as production-accepted.
+
 ## 2. Product tracks
 
 ### Track A — Hosted / Cloud
