@@ -42,6 +42,25 @@ Automated acceptance now covers aggregation, ref collision prevention, child-fra
 
 Real Chrome gate: open a reproducible cross-origin iframe page (the Claude Artifact is the current sample), verify `inspect_page` returns both outer-shell and embedded-body content, exercise one reversible child-frame action when available, then verify a stale child-frame ref is rejected after the frame navigates/reloads. Until this gate passes, do not describe cross-origin iframe support as production-accepted.
 
+### 1.2 Generated-file preview from embedded ChatGPT — root cause investigation
+
+Status: **FIXED and accepted by the owner in the Side Panel (2026-09-26).** Root cause: OpenAI's visualization sandbox sends `frame-ancestors` that lists chatgpt.com but not this extension, and the Side Panel's outermost ancestor is the extension page. The first rule matched a hand-written, shorter CSP that never equals the live header, so it never fired. The rule now matches the exact live CSP (fixture `tests/fixtures/openai-sandbox-csp-2026-09-26.txt`) and only appends this extension's origin to `frame-ancestors`; `frame-src` and `sandbox` stay exactly as sent. If OpenAI changes the CSP, the rule stops matching (no preview) instead of weakening anything.
+
+Observed behavior: ChatGPT's native **Open preview of …** works in normal top-level ChatGPT, but inside the embedded Side Panel the nested visualization shows a black surface or `An error occurred inside the visualization`. The product requirement is unchanged: preview must stay inside the Side Panel and render in ChatGPT's own right-side visualization workspace.
+
+Evidence-based root-cause direction:
+
+- Chrome Side Panel content must start from a local extension page, so our current architecture necessarily adds a `chrome-extension://...` ancestor above the embedded `chatgpt.com` document.
+- OpenAI documents HTML/code previews as sandboxed iframe content and uses `web-sandbox.oaiusercontent.com` as the default hosted component sandbox origin.
+- CSP `frame-ancestors` validates every ancestor in a nested frame chain. Therefore a sandbox frame that allows `chatgpt.com` but not our extension origin can work in top-level ChatGPT yet fail when ChatGPT is itself framed by the extension.
+- Our current frame-policy rule rewrites only the outer `chatgpt.com` sub-frame response. It does not cover a later `*.oaiusercontent.com` visualization request initiated by `chatgpt.com`.
+
+Rejected approaches: intercepting a generated-file click and opening/replaying it in a normal ChatGPT tab. That avoids the nested-frame failure but violates the required Side Panel UX, so all runtime code for that workaround was removed.
+
+Live verification on normal ChatGPT found two nested frames on `codex-inline-visualization-1fb325ab92a13cda.web-sandbox.oaiusercontent.com`. The implemented session rule is intentionally narrow: only `codex-inline-visualization-*` sub-frame responses, only when initiated by `chatgpt.com` or the sandbox itself, and only when the response CSP exactly matches the known OpenAI sandbox CSP. The replacement preserves `frame-src` and the full `sandbox` directive and only adds this extension origin to `frame-ancestors`. If OpenAI changes that CSP, the rule stops matching and fails closed instead of broadening permissions.
+
+Acceptance: generated HTML preview opens inside the Side Panel's native ChatGPT right-side visualization; normal top-level ChatGPT remains unchanged; the sandbox restrictions remain in force; an unknown/changed OpenAI CSP fails closed instead of silently broadening permissions.
+
 ## 2. Product tracks
 
 ### Track A — Hosted / Cloud
